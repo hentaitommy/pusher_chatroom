@@ -213,9 +213,8 @@ export default function Index() {
 						<Button onClick={joinChat} loading={joining}>Join</Button>
 					</div>
 				</div>
-				<div className='flex-1'>
+				<div className='flex-1 overflow-auto'>
 					<List
-						bordered
 						className='h-full'
 						dataSource={chatList}
 						renderItem={(item, index) => <List.Item onClick={() => listClickHandler(item, index)}>{item.title}</List.Item>}
@@ -232,8 +231,8 @@ export default function Index() {
 				</div>
 			</div>
 			{currentChat ? <>
-				<div className='flex flex-col'>
-					<div>
+				<div className='flex flex-col flex-1'>
+					<div className='flex'>
 						<div>
 							{currentChat.title}
 						</div>
@@ -259,8 +258,8 @@ export default function Index() {
 				</div>
 
 				<div>
-					<div>
-						{currentChat.description}
+					<div className='h-24'>
+						{currentChat.description ?? 'No description'}
 					</div>
 					<List
 						header={<div>Users</div>}
