@@ -13,5 +13,8 @@ export default {
       ],
     },
     { exact: true, path: '/login', component: 'login' },
-  ]
+  ],
+  chainWebpack(memo, { env, webpack }) {
+    memo.mode('development')
+  },
 };

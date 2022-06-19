@@ -66,7 +66,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
 				res.status(200).json(user);
 				break
 			default:
-				res.status(404).json({ error: 'Method not allowed' })
+				res.status(405).json({ error: 'Method not allowed' })
 		}
 	} catch (error: any) {
 		res.status(500).json(error);
