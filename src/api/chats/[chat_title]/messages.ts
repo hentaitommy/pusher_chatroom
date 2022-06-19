@@ -43,7 +43,13 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
 					cluster: "ap3",
 					useTLS: true
 				});
-
+				const tempMessage = {
+					chatTitle: title,
+					username,
+					content,
+					createAt: Date(),
+				}
+				pusher.trigger(title, "message", tempMessage);
 				const message = await prisma.message.create({
 					data: {
 						content,
@@ -51,9 +57,6 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
 						user: { connect: { nickname: username } },
 					}
 				})
-
-				pusher.trigger(title, "message", message);
-
 				res.status(200).json(message);
 				break
 			default:

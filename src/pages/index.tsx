@@ -162,10 +162,10 @@ export default function Index() {
 	// realtime update control
 	const [pusher, setPusher] = useState<Pusher>()
 	useEffect(() => {
-		// Pusher.logToConsole = true
-		// setPusher(new Pusher('8772d6c7efaec671c65f', {
-		// 	cluster: 'ap3'
-		// }))
+		Pusher.logToConsole = false
+		setPusher(new Pusher('8772d6c7efaec671c65f', {
+			cluster: 'ap3'
+		}))
 	}, [])
 	useEffect(() => {
 		if (!pusher || !chatList) return
@@ -214,7 +214,7 @@ export default function Index() {
 	}, [pusher, chatList])
 
 	return (
-		<div className='flex flex-row h-screen'>
+		<div className='flex flex-row h-screen min-w-[1024px]'>
 			{/* Chat List */}
 			<div className='flex flex-col border-r  flex-initial'>
 				<div className='px-4 py-2 border-b'>
