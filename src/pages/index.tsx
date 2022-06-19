@@ -132,6 +132,7 @@ export default function Index() {
 			setChatList(produce(chatList, (draft) => {
 				draft?.push(jsonRes.chat)
 			}))
+			setChatTitle('')
 		} else {
 			alert(await res.text())
 		}
@@ -186,7 +187,7 @@ export default function Index() {
 				setChatList(produce(chatList, (draft) => {
 					draft.find(chat => {
 						if (chat.title === title) {
-							chat.users.push({ username, joinAt })
+							username !== localStorage.getItem('currentUser') && chat.users.push({ username, joinAt })
 							return true
 						}
 						return false

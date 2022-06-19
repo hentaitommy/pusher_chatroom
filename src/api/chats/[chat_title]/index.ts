@@ -70,18 +70,35 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
 		useTLS: true
 	});
 
-	if (req.method && req.method in handler) {
-		try {
-			await handler[req.method]()
-		} catch (error: any) {
-			res.status(500).json(error);
+	try {
+		switch (req.method) {
+			case 'GET':
+				handler.GET()
+				break
+			case 'POST':
+				handler.POST()
+				break
+			case 'DELETE':
+				handler.DELETE()
+				break
+			default:
+				res.status(405).json({ error: 'Method not allowed' })
 		}
-		// finally {
-		// 	await prisma.$disconnect()
-		// }
-	} else {
-		res.status(405).json({ error: 'Method not allowed' })
+	} catch (error: any) {
+		res.status(500).json(error);
 	}
+	// if (req.method && req.method in handler) {
+	// 	try {
+	// 		await handler[req.method]()
+	// 	} catch (error: any) {
+	// 		res.status(500).json(error);
+	// 	}
+	// 	// finally {
+	// 	// 	await prisma.$disconnect()
+	// 	// }
+	// } else {
+	// 	res.status(405).json({ error: 'Method not allowed' })
+	// }
 	// try {
 	// 	switch (req.method) {
 	// 		case 'GET':
