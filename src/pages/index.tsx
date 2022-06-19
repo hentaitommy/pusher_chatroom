@@ -127,7 +127,7 @@ export default function Index() {
 	}
 	const joinChat = async () => {
 		setJoining(true)
-		const res = await fetch(`/api/chats/${chatTitle}`, {
+		const res = await fetch(`/api/chats/${chatTitle}/chats`, {
 			method: 'POST',
 		})
 		if (res.status === 200) {
@@ -145,7 +145,7 @@ export default function Index() {
 	const [quiting, setQuiting] = useState(false)
 	const quitChat = async (chatTitle: string) => {
 		setQuiting(true)
-		const res = await fetch(`/api/chats/${chatTitle}`, {
+		const res = await fetch(`/api/chats/${chatTitle}/chats`, {
 			method: 'DELETE',
 		})
 		if (res.status === 200) {
