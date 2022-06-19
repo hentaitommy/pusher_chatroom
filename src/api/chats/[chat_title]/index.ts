@@ -73,6 +73,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
 	try {
 		switch (req.method) {
 			case 'GET':
+				res.status(200).text('success');
 				break
 			case 'POST':
 				const record = await prisma.usersInChats.create({

@@ -179,7 +179,11 @@ export default function Index() {
 				setChatList(produce(chatList, (draft) => {
 					draft.find(chat => {
 						if (chat.title === title) {
-							chat.messages.push(message)
+							if (Array.isArray(chat.messages)) {
+								chat.messages.push(message)
+							} else {
+								chat.messages = [message]
+							}
 							return true
 						}
 						return false
