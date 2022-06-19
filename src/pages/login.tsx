@@ -40,16 +40,18 @@ export default function () {
 
 	return (
 		<div className='h-screen flex justify-center items-center bg-blue-300'>
-			<div className='bg-blue-100 rounded-lg p-4'>
+			<div className='bg-blue-100 rounded-lg px-4 pt-4'>
 				<Form
 					onFinish={onFinish}
 					onFinishFailed={onFinishFailed}
 					autoComplete="off"
 					className='w-96'
 				>
-					<header className='font-mono text-2xl mb-4'>
-						Chatroom Login
-					</header>
+					<Form.Item>
+						<header className='font-mono text-2xl'>
+							Chatroom Login
+						</header>
+					</Form.Item>
 					<Form.Item
 						label="Username"
 						name="username"
@@ -57,8 +59,8 @@ export default function () {
 					>
 						<Input />
 					</Form.Item>
-					<Form.Item>
-						<Button type="primary" htmlType="submit" loading={loading} className="">
+					<Form.Item wrapperCol={{ offset: 0}}>
+						<Button type="primary" htmlType="submit" loading={loading} className="w-40" >
 							Login
 						</Button>
 					</Form.Item>

@@ -205,25 +205,32 @@ export default function Index() {
 
 	return (
 		<div className='flex flex-row h-screen'>
-			<List
-				bordered
-				dataSource={chatList}
-				renderItem={(item, index) => <List.Item onClick={() => listClickHandler(item, index)}>{item.title}</List.Item>}
-				header={<div>
+			<div className='flex flex-col'>
+				<div className='p-4'>
 					<div className='flex justify-center'>Chat List</div>
 					<div className='flex'>
-						<Input value={chatTitle} onChange={onChatTitleChange}></Input>
+						<Input value={chatTitle} onChange={onChatTitleChange} placeholder='chat title'></Input>
 						<Button onClick={joinChat} loading={joining}>Join</Button>
 					</div>
-				</div>}
-				footer={<div>
-					Hi,{localStorage.getItem('currentUser')}
+				</div>
+				<div className='flex-1'>
+					<List
+						bordered
+						className='h-full'
+						dataSource={chatList}
+						renderItem={(item, index) => <List.Item onClick={() => listClickHandler(item, index)}>{item.title}</List.Item>}
+					/>
+				</div>
+				<div className='flex p-4'>
+					<div className='flex-1 flex justify-center items-center'>
+						Hi,{localStorage.getItem('currentUser')}
+					</div>
 					<Button onClick={() => {
 						fetch('api/logout')
 						history.push('/login')
 					}}>Logout</Button>
-				</div>}
-			/>
+				</div>
+			</div>
 			{currentChat ? <>
 				<div className='flex flex-col'>
 					<div>
@@ -263,9 +270,9 @@ export default function Index() {
 					/>
 
 				</div>
-			</> : <>
-				not seleted chat
-			</>}
+			</> : <div className='h-full w-full flex justify-center items-center text-4xl text-slate-300 font-sans'>
+				SELECTE CHAT TO CHAT
+			</div>}
 		</div>
 	);
 }
