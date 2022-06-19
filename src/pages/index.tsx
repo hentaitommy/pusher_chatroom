@@ -191,6 +191,7 @@ export default function Index() {
 				}))
 			})
 			channel.bind('user_join', ({ username, joinAt }: any) => {
+				console.log('user_join')
 				setChatList(produce(chatList, (draft) => {
 					draft.find(chat => {
 						if (chat.title === title) {
@@ -202,11 +203,14 @@ export default function Index() {
 				}))
 			})
 			channel.bind('user_quit', ({ username }: any) => {
+				console.log('user_quit')
 				setChatList(produce(chatList, (draft) => {
 					draft.find(chat => {
 						if (chat.title === title) {
 							const i = chat.users.findIndex(u => u.username === username)
-							chat.users.splice(i, 1)
+							if(i!== -1){
+								chat.users.splice(i, 1)
+							}
 							return true
 						}
 						return false
