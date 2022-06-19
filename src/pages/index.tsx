@@ -3,6 +3,7 @@ import Pusher from 'pusher-js'
 import { List, Input, Button } from 'antd';
 import produce from 'immer'
 import { history } from 'umi'
+import React from 'react';
 
 const { TextArea } = Input;
 
@@ -54,18 +55,23 @@ export default function Index() {
 
 	// current chat control
 	const [currentChatIndex, setCurrentChatIndex] = useState<number>()
+	const [loading, setLoading] = useState(false)
+
 	const currentChat = useMemo(() => {
 		if (chatList && currentChatIndex !== undefined) {
 			return chatList[currentChatIndex]
 		}
 	}, [chatList, currentChatIndex])
-	const messageListBottom = useRef<HTMLDivElement>(null)
+	const messageList = useRef<HTMLDivElement>(null)
 	useEffect(() => {
-		messageListBottom?.current?.scrollIntoView()
+		if (messageList.current) {
+			messageList.current.scrollTop = 10 ** 10
+		}
 	}, [currentChat])
 	const listClickHandler = async (item: Chat, index: number) => {
 		setCurrentChatIndex(index)
 		if (!item.messages) {
+			setLoading(true)
 			const res = await fetch(`api/chats/${item.title}/messages`)
 			const messages = await res.json()
 			setChatList(
@@ -79,6 +85,10 @@ export default function Index() {
 					})
 				})
 			)
+			setLoading(false)
+			if (messageList.current) {
+				messageList.current.scrollTop = 10 ** 10
+			}
 		}
 	}
 
@@ -153,9 +163,9 @@ export default function Index() {
 	const [pusher, setPusher] = useState<Pusher>()
 	useEffect(() => {
 		// Pusher.logToConsole = true
-		setPusher(new Pusher('8772d6c7efaec671c65f', {
-			cluster: 'ap3'
-		}))
+		// setPusher(new Pusher('8772d6c7efaec671c65f', {
+		// 	cluster: 'ap3'
+		// }))
 	}, [])
 	useEffect(() => {
 		if (!pusher || !chatList) return
@@ -205,9 +215,10 @@ export default function Index() {
 
 	return (
 		<div className='flex flex-row h-screen'>
-			<div className='flex flex-col'>
-				<div className='p-4'>
-					<div className='flex justify-center'>Chat List</div>
+			{/* Chat List */}
+			<div className='flex flex-col border-r  flex-initial'>
+				<div className='px-4 py-2 border-b'>
+					<div className='flex justify-center text-xl pb-2'>Chat List</div>
 					<div className='flex'>
 						<Input value={chatTitle} onChange={onChatTitleChange} placeholder='chat title'></Input>
 						<Button onClick={joinChat} loading={joining}>Join</Button>
@@ -217,10 +228,14 @@ export default function Index() {
 					<List
 						className='h-full'
 						dataSource={chatList}
-						renderItem={(item, index) => <List.Item onClick={() => listClickHandler(item, index)}>{item.title}</List.Item>}
+						renderItem={(item, index) =>
+							<List.Item onClick={() => listClickHandler(item, index)}>
+								<div className='px-2'>{item.title}</div>
+							</List.Item>
+						}
 					/>
 				</div>
-				<div className='flex p-4'>
+				<div className='flex p-4 border-t'>
 					<div className='flex-1 flex justify-center items-center'>
 						Hi,{localStorage.getItem('currentUser')}
 					</div>
@@ -231,45 +246,59 @@ export default function Index() {
 				</div>
 			</div>
 			{currentChat ? <>
+				{/* Message Part */}
 				<div className='flex flex-col flex-1'>
-					<div className='flex'>
-						<div>
+					<div className='px-4 py-2 relative border-b'>
+						<div className='w-full flex items-center justify-center text-xl'>
 							{currentChat.title}
 						</div>
-						<Button onClick={() => quitChat(currentChat.title)} loading={quiting}>Quit</Button>
+						<div className='absolute right-4 top-2'>
+							<Button onClick={() => quitChat(currentChat.title)} loading={quiting}>Quit</Button>
+						</div>
 					</div>
-					<div className='overflow-auto'>
+					<div className='overflow-auto flex-1' ref={messageList}>
 						<List
-							bordered
+							className='h-full'
 							dataSource={currentChat.messages}
 							renderItem={item => <List.Item>
-								<div>
-									{item.username + item.createAt}
+								<div className='px-2'>
+									<div>{item.username + ' ' + (new Date(item.createAt)).toLocaleString()}</div>
+									<div>{item.content}</div>
 								</div>
-								{item.content}
+								
 							</List.Item>}
+							loading={loading}
 						/>
-						<div ref={messageListBottom}></div>
+					</div>
+					<div className='p-4 border-t'>
+						<TextArea rows={4} bordered={false} value={message} onChange={onMessageChange} className='resize-none' />
+						<div className='flex flex-row-reverse'>
+							<Button onClick={sendMessage} loading={sending}>Send</Button>
+						</div>
+					</div>
+				</div>
+				{/* Chat Detail*/}
+				<div className='border-l w-80'>
+					<div className='h-24 border-b'>
+						<div className='text-xl border-b p-2'>Description</div>
+						<div className='p-2'>
+							{currentChat.description ?? 'No description'}
+						</div>
 					</div>
 					<div>
-						<TextArea rows={4} value={message} onChange={onMessageChange} />
-						<Button onClick={sendMessage} loading={sending}>Send</Button>
+						<div className='text-xl p-2 border-b'>Users</div>
+						<div className='flex-1 overflow-auto'>
+							<List
+								className='h-full'
+								dataSource={currentChat.users}
+								renderItem={item => <List.Item >
+									<div className='px-2'>{item.username + ' ' + (new Date(item.joinAt)).toLocaleString()}</div>
+								</List.Item>}
+							/>
+						</div>
 					</div>
 				</div>
-
-				<div>
-					<div className='h-24'>
-						{currentChat.description ?? 'No description'}
-					</div>
-					<List
-						header={<div>Users</div>}
-						bordered
-						dataSource={currentChat.users}
-						renderItem={item => <List.Item>{item.username + item.joinAt}</List.Item>}
-					/>
-
-				</div>
-			</> : <div className='h-full w-full flex justify-center items-center text-4xl text-slate-300 font-sans'>
+			</> : <div className='h-full flex-1 flex justify-center items-center text-4xl text-slate-300 font-sans'>
 				SELECTE CHAT TO CHAT
 			</div>}
 		</div>
