@@ -30,7 +30,9 @@ export interface Chat {
 export default function Index() {
 	// chat data control
 	const [chatList, setChatList] = useState<Chat[]>()
+	const [listLoading, setListLoading] = useState(false)
 	async function getChatList() {
+		setListLoading(true)
 		const res = await fetch('/api/chats')
 		if (res.status === 401) {
 			history.push('/login')
@@ -47,6 +49,7 @@ export default function Index() {
 		// 	messages: chat.messages,
 		// 	users: chat.users
 		// }))
+		setListLoading(false)
 		setChatList(chatList)
 	}
 	useEffect(() => {
@@ -227,6 +230,7 @@ export default function Index() {
 				</div>
 				<div className='flex-1 overflow-auto'>
 					<List
+						loading={listLoading}
 						className='h-full'
 						dataSource={chatList}
 						renderItem={(item, index) =>
@@ -266,7 +270,7 @@ export default function Index() {
 									<div>{item.username + ' ' + (new Date(item.createAt)).toLocaleString()}</div>
 									<div>{item.content}</div>
 								</div>
-								
+
 							</List.Item>}
 							loading={loading}
 						/>
@@ -283,7 +287,7 @@ export default function Index() {
 					<div className='h-24 border-b'>
 						<div className='text-xl border-b p-2'>Description</div>
 						<div className='p-2'>
-							{currentChat.description ?? 'No description'}
+							{currentChat.description ? currentChat.description : 'No description'}
 						</div>
 					</div>
 					<div>

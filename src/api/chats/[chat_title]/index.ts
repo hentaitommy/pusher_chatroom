@@ -17,49 +17,49 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
 	const title = req.params.chat_title
 	if (!title) return res.status(400).json({ error: 'chat must has a title' })
 
-	const handler: {
-		[index: string]: () => void
-	} = {
-		GET: () => {
-			// get detail of chatroom
-		},
+	// const handler: {
+	// 	[index: string]: () => void
+	// } = {
+	// 	GET: () => {
+	// 		// get detail of chatroom
+	// 	},
 
-		POST: async () => {
-			const record = await prisma.usersInChats.create({
-				data: {
-					user: { connect: { nickname } },
-					chat: {
-						connectOrCreate: {
-							where: { title },
-							create: { title },
-						}
-					}
-				},
-				include: {
-					chat: {
-						include: {
-							users: true
-						}
-					}
-				}
-			})
-			pusher.trigger(title, "user_join", record);
-			res.status(200).json(record);
-		},
+	// 	POST: async () => {
+	// 		const record = await prisma.usersInChats.create({
+	// 			data: {
+	// 				user: { connect: { nickname } },
+	// 				chat: {
+	// 					connectOrCreate: {
+	// 						where: { title },
+	// 						create: { title },
+	// 					}
+	// 				}
+	// 			},
+	// 			include: {
+	// 				chat: {
+	// 					include: {
+	// 						users: true
+	// 					}
+	// 				}
+	// 			}
+	// 		})
+	// 		pusher.trigger(title, "user_join", record);
+	// 		res.status(200).json(record);
+	// 	},
 
-		DELETE: async () => {
-			const user = await prisma.usersInChats.delete({
-				where: {
-					username_chatTitle: {
-						username: nickname,
-						chatTitle: title,
-					}
-				},
-			})
-			pusher.trigger(title, "user_quit", user);
-			res.status(200).json(user);
-		}
-	}
+	// 	DELETE: async () => {
+	// 		const user = await prisma.usersInChats.delete({
+	// 			where: {
+	// 				username_chatTitle: {
+	// 					username: nickname,
+	// 					chatTitle: title,
+	// 				}
+	// 			},
+	// 		})
+	// 		pusher.trigger(title, "user_quit", user);
+	// 		res.status(200).json(user);
+	// 	}
+	// }
 
 	const prisma = new PrismaClient();
 	const pusher = new Pusher({
@@ -73,16 +73,43 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
 	try {
 		switch (req.method) {
 			case 'GET':
-				handler.GET()
 				break
 			case 'POST':
-				handler.POST()
+				const record = await prisma.usersInChats.create({
+					data: {
+						user: { connect: { nickname } },
+						chat: {
+							connectOrCreate: {
+								where: { title },
+								create: { title },
+							}
+						}
+					},
+					include: {
+						chat: {
+							include: {
+								users: true
+							}
+						}
+					}
+				})
+				pusher.trigger(title, "user_join", record);
+				res.status(200).json(record);
 				break
 			case 'DELETE':
-				handler.DELETE()
+				const user = await prisma.usersInChats.delete({
+					where: {
+						username_chatTitle: {
+							username: nickname,
+							chatTitle: title,
+						}
+					},
+				})
+				pusher.trigger(title, "user_quit", user);
+				res.status(200).json(user);
 				break
 			default:
-				res.status(405).json({ error: 'Method not allowed' })
+				res.status(404).json({ error: 'Method not allowed' })
 		}
 	} catch (error: any) {
 		res.status(500).json(error);
