@@ -1,0 +1,43 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+  provider             = "mysql"
+  referentialIntegrity = "prisma"
+  url                  = env("DATABASE_URL")
+}
+
+model User {
+  nickname String         @id
+  chats    UsersInChats[]
+  Message  Message[]
+}
+
+model Chat {
+  title       String         @id
+  description String         @default("")
+  users       UsersInChats[]
+  messages    Message[]
+}
+
+model UsersInChats {
+  user      User     @relation(fields: [username], references: [nickname])
+  username  String
+  chat      Chat     @relation(fields: [chatTitle], references: [title])
+  chatTitle String
+  joinAt    DateTime @default(now())
+
+  @@id([username, chatTitle])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  chat      Chat     @relation(fields: [chatTitle], references: [title])
+  chatTitle String
+  user      User     @relation(fields: [username], references: [nickname])
+  username  String
+  createAt  DateTime @default(now())
+  content   String
+}
